@@ -74,13 +74,25 @@ public class MapManager : MonoBehaviour
 
     private void SpawnCharacter()
     {
+        Tilemap tileMap = GetComponentInChildren<Tilemap>(); 
+
         foreach (var character in characters)
         {
             var location = _locationList.First(i => !i.Value);
-            Instantiate(character, location.Key, Quaternion.identity);
+            GameObject characterInstance = Instantiate(character, location.Key, Quaternion.identity);
+
             _locationList[location.Key] = true;
+
+            Vector3Int cellPosition = tileMap.WorldToCell(location.Key);
+            Vector2Int tileKey = new Vector2Int(cellPosition.x, cellPosition.y);
+            
+            if (_map.ContainsKey(tileKey))
+            {
+                _map[tileKey].isBlocked = true;
+            }
         }
     }
+
     
     public List<TileNode> GetNeighbourTiles(TileNode currentTile, List<TileNode> availableTiles)
     {
@@ -114,5 +126,63 @@ public class MapManager : MonoBehaviour
         }
 
         return neighbourTiles;
+    }
+
+    public List<TileNode> GetStraightTiles(TileNode currentTile, int attackRange)
+    {
+        List<TileNode> availableTiles = new List<TileNode>();
+        for (int i = 1; i <= attackRange; i++)
+        {
+            Vector2Int locationToCheck = (Vector2Int)currentTile.gridLocationInt + new Vector2Int(i, 0);
+            if (_map.ContainsKey(locationToCheck))
+            {
+                if (!_map[locationToCheck].isBlocked && Mathf.Abs(currentTile.transform.position.z -
+                                                                  _map[locationToCheck].transform.position.z) <= 1)
+                    availableTiles.Add(_map[locationToCheck]);
+                else
+                    break;
+            }
+        }
+        
+        for (int i = 1; i <= attackRange; i++)
+        {
+            Vector2Int locationToCheck = (Vector2Int)currentTile.gridLocationInt + new Vector2Int(-i, 0);
+            if (_map.ContainsKey(locationToCheck))
+            {
+                if (!_map[locationToCheck].isBlocked && Mathf.Abs(currentTile.transform.position.z -
+                                                                  _map[locationToCheck].transform.position.z) <= 1)
+                    availableTiles.Add(_map[locationToCheck]);
+                else
+                    break;
+            }
+        }
+        
+        for (int i = 1; i <= attackRange; i++)
+        {
+            Vector2Int locationToCheck = (Vector2Int)currentTile.gridLocationInt + new Vector2Int(0, -i);
+            if (_map.ContainsKey(locationToCheck))
+            {
+                if (!_map[locationToCheck].isBlocked && Mathf.Abs(currentTile.transform.position.z -
+                                                                  _map[locationToCheck].transform.position.z) <= 1)
+                    availableTiles.Add(_map[locationToCheck]);
+                else
+                    break;
+            }
+        }
+        
+        for (int i = 1; i <= attackRange; i++)
+        {
+            Vector2Int locationToCheck = (Vector2Int)currentTile.gridLocationInt + new Vector2Int(0, i);
+            if (_map.ContainsKey(locationToCheck))
+            {
+                if (!_map[locationToCheck].isBlocked && Mathf.Abs(currentTile.transform.position.z -
+                                                                  _map[locationToCheck].transform.position.z) <= 1)
+                    availableTiles.Add(_map[locationToCheck]);
+                else
+                    break;
+            }
+        }
+
+        return availableTiles;
     }
 }

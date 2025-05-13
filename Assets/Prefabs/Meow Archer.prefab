@@ -179,4 +179,4 @@ MonoBehaviour:
   isMove: 0
   standingTile: {fileID: 0}
   moveRange: 3
-  attackRange: 0
+  attackRange: 4

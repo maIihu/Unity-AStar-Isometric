@@ -15,6 +15,7 @@ public abstract class CharacterBase : MonoBehaviour
 
     private List<TileNode> _path;
     private List<TileNode> _tilesCanMove;
+    private List<TileNode> _attackArea;
     
     private GameObject _tileContainer;
 
@@ -29,6 +30,7 @@ public abstract class CharacterBase : MonoBehaviour
 
         _path = new List<TileNode>();
         _tilesCanMove = new List<TileNode>();
+        _attackArea = new List<TileNode>();
         
         for (int i = 0; i < _tileContainer.transform.childCount; i++)
         {
@@ -58,6 +60,15 @@ public abstract class CharacterBase : MonoBehaviour
             {
                 tile.GetComponent<SpriteRenderer>().color = Color.white;
             }
+            
+            if (_attackArea.Count > 0)
+            {
+                foreach (var tile in _attackArea)
+                {
+                    tile.GetComponent<SpriteRenderer>().color = Color.white;
+                }
+            }
+            _attackArea.Clear();
             _tilesCanMove.Clear();
         }
     }
@@ -67,6 +78,7 @@ public abstract class CharacterBase : MonoBehaviour
         if(_tilesCanMove.Count <= 0)
             GetInRangeTiles();
     }
+    
     public void MoveToTile(TileNode tileToMove)
     {
         Debug.Log("Ham nay chay");
@@ -103,6 +115,19 @@ public abstract class CharacterBase : MonoBehaviour
             _path.RemoveAt(0);
         }
         isMove = false;
+    }
+
+    public void ShowAttackRange()
+    {
+        _attackArea = MapManager.Instance.GetStraightTiles(this.standingTile, attackRange);
+        
+        if (_attackArea.Count > 0)
+        {
+            foreach (var tile in _attackArea)
+            {
+                tile.GetComponent<SpriteRenderer>().color = Color.red;
+            }
+        }
     }
     
 }

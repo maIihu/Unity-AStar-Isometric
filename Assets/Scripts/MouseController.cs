@@ -11,11 +11,14 @@ public class MouseController : MonoBehaviour
     private GameObject[] _characters;
     private bool _isAction = false;
 
+    
+
     private void Start()
     {
         // cai nay loi~ vi gan chi gan Prefab chu khogn lay gameobject tren Hierarchy
         //_characters = MapManager.Instance.characters; 
         _characters = GameObject.FindGameObjectsWithTag("Character");
+        
     }
 
     private void Update()
@@ -26,11 +29,13 @@ public class MouseController : MonoBehaviour
             if (hit.HasValue)
             {
                 GameObject gameObjectActive = hit.Value.transform.gameObject;
-                Debug.Log("Click to " + gameObjectActive.name);
+                //Debug.Log("Click to " + gameObjectActive.name);
                 if (gameObjectActive.CompareTag("Character") && !_isAction)
                 {
-                    gameObjectActive.GetComponent<CharacterBase>().isMove = true;
-                    gameObjectActive.GetComponent<CharacterBase>().ShowTileCanMove();
+                    CharacterBase characterBaseClone = gameObjectActive.GetComponent<CharacterBase>();
+                    characterBaseClone.isMove = true;
+                    characterBaseClone.ShowTileCanMove();
+                    characterBaseClone.ShowAttackRange();
                     _isAction = true;
                 }
                 
@@ -41,7 +46,9 @@ public class MouseController : MonoBehaviour
                         CharacterBase characterBase = character.GetComponent<CharacterBase>();
                         if (characterBase.isMove)
                         {
+                            characterBase.standingTile.GetComponent<TileNode>().isBlocked = false;
                             characterBase.MoveToTile(gameObjectActive.GetComponent<TileNode>());
+                            characterBase.standingTile.GetComponent<TileNode>().isBlocked = true;
                         }
                     }
                 }
